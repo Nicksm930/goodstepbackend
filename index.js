@@ -141,7 +141,22 @@ else{
 }
 
 });
-  
+// app.post('/updateLevel',async(req,res)=>{
+//   const {levelID,levelData}=req.body;
+
+//   const updatedDocument = await Level.findOneAndUpdate(
+//     { levelID: levelID },
+//     {levelName:levelData.levelName},
+//     { new: true }
+//   );
+//   if (updatedDocument) {
+//     console.log(updatedDocument)
+//     return res.status(607).json({ message: 'Document  found' });
+//   }
+//   else{
+//     return res.status(608).json({ message: 'Document not  found' });
+//   }
+// });
 // Start the Express server
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
