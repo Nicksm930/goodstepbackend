@@ -42,7 +42,8 @@ const userSchema = new mongoose.Schema({
   mobile:String,
   dob:String,
   identity:String,
-  levels:Array
+  levels:[levelSchema]
+//   levels:Array
   // Add more fields as needed
 });
 const Level=mongoose.model('Level',levelSchema);
@@ -106,6 +107,13 @@ app.post('/addLevel',async (req,res)=> {
     // const result=await User.updateMany(levelData,savedLevel);
     // console.log(result,"result");
     // console.log(savedLevel,"Saved Level");
+    const users=await User.find();
+     users.forEach((user)=>{
+        user.levels.push(savedLevel);
+        user=new User(user);
+        user.save();
+    })
+   
     const levels=await Level.find();
     console.log(levels);
 
