@@ -58,9 +58,10 @@ app.post('/register', async (req, res) => {
   try {
     // const users = await User.find();
     // console.log(users,"users===>");
-    const userData = req.body; // Assuming you send JSON data in the request body
+    const {email} = req.body; // Assuming you send JSON data in the request body
+    const userData=req.body;
     console.log(userData,"User Body Data");
-    const user1 = await User.findOne(userData);
+    const user1 = await User.findOne({email});
 
     console.log(user1,"user1111");
     if(user1 == null){
