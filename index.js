@@ -2,12 +2,12 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-
+//dO6jt5HvXG6V1EAk key
 const app = express();
 const port = 3000;
 
 // 2. Configure MongoDB connection
-mongoose.connect('mongodb://localhost:27017/goodstep', {
+mongoose.connect('mongodb+srv://nikhilsm930:dO6jt5HvXG6V1EAk@clustergoodstepprod.geih0ye.mongodb.net/goodstepprod', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
