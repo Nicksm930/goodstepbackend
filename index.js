@@ -1,4 +1,5 @@
 // 1. Set up your Express.js application
+const cors = require("cors");
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -52,7 +53,7 @@ const Step=mongoose.model('Step',levelStepsSchema)
 
 // 4. Parse JSON in request body
 app.use(bodyParser.json());
-
+app.use(cors());
 // 5. Create an API route to handle user creation
 app.post('/register', async (req, res) => {
   try {
