@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 //dO6jt5HvXG6V1EAk key
 const app = express();
-const port = 3000;
+const port = 3001;
 
 // 2. Configure MongoDB connection
 mongoose.connect('mongodb+srv://nikhilsm930:dO6jt5HvXG6V1EAk@clustergoodstepprod.geih0ye.mongodb.net/goodstepprod', {
@@ -27,8 +27,9 @@ const levelStepsSchema=new mongoose.Schema({
 const levelSchema= new mongoose.Schema({
     levelID:Number,
     levelName:String,
-    levelDesc:String,
-    levelStatus:Boolean,
+    levelDesc:Array,
+    levelStatus:String,
+    levelVisibility:Boolean,
     levelSteps:Array,
     keywords:Array
 });
@@ -82,6 +83,7 @@ app.post('/register', async (req, res) => {
     res.status(400).json({ error: 'Failed to create user' });
   }
 });
+
 app.post('/login', async (req, res) => {
     const { email, password } = req.body;
   
@@ -102,6 +104,7 @@ app.post('/login', async (req, res) => {
       res.status(500).json({ message: 'Server error' });
     }
   });
+
 app.post('/addLevel',async (req,res)=> {
    const levelData=req.body;
    const level = new Level(levelData);
@@ -121,6 +124,7 @@ app.post('/addLevel',async (req,res)=> {
 
     res.status(201).json(levels);
 });
+
 app.post('/allLevel',async(req,res)=>{
 
     const {email}=req.body;
@@ -130,6 +134,7 @@ app.post('/allLevel',async(req,res)=>{
     console.log(JSON.stringify(levels));
     res.status(200).json(levels);
 });
+
 app.post('/openLevel',async(req,res)=>{
 const {levelID,email}=req.body;
 const user=await User.findOne({email});
