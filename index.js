@@ -140,13 +140,13 @@ app.post("/levelsubmit", async (req, res) => {
 
   quiz.forEach((item, key) => {
     if (item.type === "keyword check") {
-      const check = item.answer.some((val) => answers[key] === val);
+      const check = item.answer.split(",").some((val) => answers[key] === val);
 
       a.push(check);
     } else if (item.type === "option") {
       a.push(item.answer === answers[key]);
     } else if (item.type === "charlength") {
-      a.push(answers[key].length >= item.answerLength);
+      a.push(answers[key].length >= item.answer);
     }
   });
 
