@@ -3,6 +3,7 @@ const cors = require("cors");
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const nodemailer = require("nodemailer");
 //dO6jt5HvXG6V1EAk key
 const app = express();
 const port = 3000;
@@ -58,7 +59,9 @@ const userSchema = new mongoose.Schema({
   community:Array,
   city:String,
   occupation:String,
-  levels:[levelSchema]
+  levels:[levelSchema],
+  qrcode:String,
+  story:String
 });
 const Level=mongoose.model('Level',levelSchema);
 const User = mongoose.model('User', userSchema);
