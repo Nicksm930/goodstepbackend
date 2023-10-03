@@ -3,7 +3,6 @@ const cors = require("cors");
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const nodemailer = require("nodemailer");
 //dO6jt5HvXG6V1EAk key
 const app = express();
 const port = 3000;
@@ -42,6 +41,7 @@ const levelSchema= new mongoose.Schema({
 const userSchema = new mongoose.Schema({
  username: String,
   email: String,
+ userId:String,
   firstName:String,
   lastName:String,
   password:String,
@@ -60,8 +60,9 @@ const userSchema = new mongoose.Schema({
   city:String,
   occupation:String,
   levels:[levelSchema],
+  story:String,
   qrcode:String,
-  story:String
+  profile:String
 });
 const Level=mongoose.model('Level',levelSchema);
 const User = mongoose.model('User', userSchema);
@@ -77,6 +78,10 @@ app.post('/register', async (req, res) => {
     // console.log(users,"users===>");
     const {email} = req.body; // Assuming you send JSON data in the request body
     const userData=req.body;
+    const userID = generateUserID();
+    userData.userId=userID;
+   const qrcode=`https://game.thegoodstep.com/profile/${userID}`;
+   userData.qrcode=qrcode;
     console.log(userData,"User Body Data");
     const user1 = await User.findOne({email});
     console.log(user1,"user1111");
@@ -85,6 +90,7 @@ app.post('/register', async (req, res) => {
         userData.levels=levels;
         const user = new User(userData);
     const savedUser = await user.save();
+
     res.status(201).json(savedUser);
     }
     else{
@@ -286,6 +292,18 @@ app.post('/levelsubmit',async(req,res)=>{
 
 
 });
+function generateUserID() {
+  // Get the current timestamp in milliseconds
+  const timestamp = Date.now();
+
+  // Generate a random number between 0 and 9999 (adjust the range as needed)
+  const randomPart = Math.floor(Math.random() * 10000);
+
+  // Combine timestamp and random part to create the user ID
+  const userID = `${timestamp}${randomPart}`;
+
+  return userID;
+}
 // app.post('/updateLevel',async(req,res)=>{
 //   const {levelID,levelData}=req.body;
 
