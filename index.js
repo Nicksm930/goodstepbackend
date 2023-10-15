@@ -49,6 +49,8 @@ const userSchema = new mongoose.Schema({
   gender:String,
   mobile:String,
   dob:String,
+  badgeName:String,
+  profilebulletpoints:Array,
   identity:String,
   activity:Array,
   linkedin:String,
@@ -57,12 +59,16 @@ const userSchema = new mongoose.Schema({
   telegram:String,
   whatsapp:String,
   community:Array,
-  city:String,
+  liveIn:String,
   occupation:String,
   levels:[levelSchema],
-  story:String,
+  mystory:String,
   qrcode:String,
-  profile:String
+  profile:String,
+  roadMapcarouselData:Array,
+        myTheoryofChange:String,
+        followed:Array,
+        following:Array
 });
 const Level=mongoose.model('Level',levelSchema);
 const User = mongoose.model('User', userSchema);
@@ -71,6 +77,103 @@ const Step=mongoose.model('Step',levelStepsSchema)
 // 4. Parse JSON in request body
 app.use(bodyParser.json());
 app.use(cors());
+app.post('/allusers',async(req,res)=>{
+
+
+const collection=db.collection('users');
+        console.log(collection,'collection');
+
+const allusers=await collection.find({}).toArray();
+        console.log(allusers);
+
+return res.status(200).json({users:allusers});
+
+//return res.status(500).json({message:'server timeout'});
+
+
+});
+app.post('/search',async(req,res)=>{
+ const collection = db.collection('users'); // Replace 'users' with your collection name
+
+    // Build the query based on the provided parameters
+    const query = {};
+
+   const {name,location,followed}=req.body;
+    // Execute the query
+
+    const filteredUsers = await collection.find({$or:[{firstName:name},{lastName:name},{username:name},{liveIn:location}]}).toArray();
+        console.log(filteredUsers,'filteredUsers');
+        res.status(201).json({message:'success',filtereduser:filteredUsers });
+
+});
+app.post('/followuser',async(req,res)=>{
+const {followingId,followerId}=req.body;
+const followinguser=await User.findOne({userId:followingId});
+        const following=followinguser.following;
+        following.push(followerId);
+const updatefollowinguser=await User.findOneAndUpdate({userId:followingId},{following:following},{new:true});
+         const followeruser=await User.findOne({userId:followerId});
+        const follower=followeruser.followed;
+        follower.push(followingId);
+console.log(updatefollowinguser);
+const updatefolloweduser=await User.findOneAndUpdate({userId:followerId},{followed:follower},{new:true});
+        console.log(updatefolloweduser);
+        if(!updatefollowinguser && !updatefolloweduser){
+                return res.status(404).json('error while updating');
+        }else{
+
+res.status(200).json({message:'success',followingUser:updatefollowinguser,followedUser:updatefolloweduser});
+        }
+
+});
+app.post('/updateprofile/:_id',async(req,res)=>{
+
+        const Id=req.params._id;
+        console.log(Id,"ID");
+        const updateData = req.body;
+        try {
+    // Find the user by ID and update
+    const updatedUser = await User.findByIdAndUpdate( Id, updateData, { new: true });
+        console.log(updatedUser,"updated user");
+    if (!updatedUser) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    return res.json({message:'user updated',user:updatedUser});
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+app.post('/getUserName',async(req,res)=>{
+const {userId}=req.body;
+
+const user=await User.findOne({userId:userId});
+        res.status(200).json({message:'success',username:user.username,firstname:user.firstName,lastname:user.lastName,badgeName:user.badgeName});
+});
+app.post('/getUserInfo/:userId',async(req,res)=>{
+  const userId = req.params.userId;
+        console.log("userId",userId);
+
+  try {
+
+    const user = await User.findOne({userId:userId});
+        console.log("user",user);
+    if (!user) {
+      return res.status(401).json({ message: 'User Session Expired'});
+    }
+
+    // 5. Fetch the user object from the MongoDB database
+    // You can select specific fields if needed, e.g., { username: 1, email: 1 }
+    // Just make sure not to return sensitive data like passwords
+    res.status(200).json(user);
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({ message: 'Server error' });
+  }
+
+});
 // 5. Create an API route to handle user creation
 app.post('/register', async (req, res) => {
   try {
@@ -82,6 +185,118 @@ app.post('/register', async (req, res) => {
     userData.userId=userID;
    const qrcode=`https://game.thegoodstep.com/profile/${userID}`;
    userData.qrcode=qrcode;
+
+  const shortBio="Your 1-line bio (100 character limit)";
+          userData.shortBio=shortBio;
+  const mobile="";
+          userData.mobile=mobile;
+  const badgeName="Your Org/Role";
+          userData.badgeName=badgeName;
+         const myTheoryofChange = "Share your take on one top pathway to maximum climate impact. Think thematic solutions, collaboration advice, policy suggestions, etc";
+  const roadMapcarouselData = [
+
+        {
+
+            title: 'Share areas of interest',
+
+            description: 'Add a brief description of your role, offer up your expertise, and/or request for support. Consider adding lesser known facts and stories to drive engagement',
+
+            name: 'EnvironmentalJustice'
+
+        },
+
+        {
+
+            title: 'Share areas of interest',
+
+            description: 'Add a brief description of your role, offer up your expertise, and/or request for support. Consider adding lesser known facts and stories to drive engagement',
+
+            name: 'CorporateSustainability'
+
+        },
+
+        {
+
+            title: 'Share areas of interest',
+
+            description: 'Add a brief description of your role, offer up your expertise, and/or request for support. Consider adding lesser known facts and stories to drive engagement',
+
+            name: 'ConsumerAwareness'
+
+        }
+
+    ];
+  const profilebulletpoints=[
+    {
+        "point": `${email}`
+    },
+    {
+        "point": `${userData.liveIn}`
+    },
+    {
+        "point": `${userData.occupation}`
+    }
+];
+          userData.profilebulletpoints=profilebulletpoints;
+  const activity=[
+
+        {
+
+            link: 'www.thegoodstep.com',
+
+            title: 'Check out our website! ', name: 'webLinks'
+
+        },
+
+        {
+
+            link: 'https://www.instagram.com/goodstep.earth/',
+
+            title: 'Follow our journey on instagram!', name: 'instagram'
+
+        },
+
+        {
+
+            link: 'https://www.youtube.com/',
+
+            title: 'Recommed a movie/video', name: 'movies_Videos'
+
+        },
+
+        {
+
+            link: 'https://www.amazon.in/',
+
+            title: 'Give a book recommendation', name: 'books_Reports'
+
+        },
+
+        {
+
+            link: 'https://open.spotify.com/',
+
+            title: 'Share your favourite podcast', name: 'podcasts'
+
+        }
+
+    ];
+          userData.activity=activity;
+  const linkedin="";
+          userData.linkedin=linkedin;
+  const facebook="";
+          userData.facebook=facebook;
+  const instagram="";
+          userData.instagram=instagram;
+  const telegram="";
+          userData.telegram=telegram;
+  const community=[];
+          userData.community=community;
+  const mystory="Your space to tell your story your way. Can include your climate WHY, background, experience, interests, etc.";
+          userData.mystory=mystory;
+          userData.myTheoryofChange=myTheoryofChange;
+          userData.roadMapcarouselData=roadMapcarouselData;
+
     console.log(userData,"User Body Data");
     const user1 = await User.findOne({email});
     console.log(user1,"user1111");
@@ -121,13 +336,7 @@ else{
 res.send({message:"user not found"})
 }
 })
-app.post("/profile/",async(req,res)=>{
-console.log(req);
-  console.log(req.query.id);
-const user=await User.findById(req.query.id);
-  console.log(user);
-  res.send(user);
-});
+
 app.post("/checkEmail",async(req,res)=>{
   const {email}=req.body;
 
